@@ -39,6 +39,16 @@ app.post("/books", (req, res) => {
     res.json(newBook);
 });
 
+app.put("/books/:id", (req, res) => {
+  const updatedBook: Book = req.body;
+  const id = Number(req.params.id);
+  const updated = books.find((book) => book.id === id);
+  if (updated) {
+    res.json(updated);
+  } else {
+    res.status(404).send("Book not found");
+  }
+});
 
 
 
