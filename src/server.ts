@@ -3,6 +3,7 @@ import express from "express";
 import type { Request, Response } from "express";
 const app = express();
 const port = 3000;
+app.use(express.json())
 
 
 
@@ -30,6 +31,14 @@ app.get("/books/:id", (req, res) => {
     res.status(404).send("Book not found");
     }
 });  
+
+app.post("/books", (req, res) => {
+    const newBook: Book = req.body;
+    newBook.id = books.length + 1;
+    books.push(newBook);
+    res.json(newBook);
+});
+
 
 
 
@@ -212,3 +221,6 @@ const books: Book[] = [
     groups: "Fiction",
   },
 ];
+
+
+
