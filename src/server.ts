@@ -10,9 +10,27 @@ app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-app.get("/books", (req, res) => {
-  res.json(books);
+
+app.get("/books", async (req: Request, res: Response) => {
+  if (req.query.title) {
+    const title = req.query.title;
+    const filteredBooks = books.filter((book) => book.title === String(title));
+    res.json(filteredBooks);
+  } else {
+    res.json(books);
+  }
 });
+
+app.get("/books/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const book = books.find((book) => book.id === id);
+    if (book) {
+    res.json(book);
+    } else {
+    res.status(404).send("Book not found");
+    }
+});  
+
 
 
 interface Book {
