@@ -11,20 +11,51 @@ app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
+function getBookByGroups(groups:string): Book[] {
+  const filteredBooks = books.filter((book) => book.groups === groups);
+  return filteredBooks;
+}
+
+function getAllBooks(): Book[] {
+  return books;
+}
+
+function getBookById(id: number): Book | undefined {
+  return books.find((book) => book.id === id);
+}
+
+function addBook(newBook: Book): Book {
+  newBook.id = books.length + 1;
+  books.push(newBook);
+  return newBook;
+}
+
+function updateBook(id: number, updatedData: Partial<Book>): Book | undefined {
+  const book = getBookById(id);
+  if (!book) return undefined;
+  if (updatedData.title !== undefined) book.title = updatedData.title;
+  if (updatedData.Author_name !== undefined) book.Author_name = updatedData.Author_name;
+  if (updatedData.description !== undefined) book.description = updatedData.description;
+  if (updatedData.groups !== undefined) book.groups = updatedData.groups;
+  return book;
+}
+
+
 
 app.get("/books", async (req: Request, res: Response) => {
-  if (req.query.title) {
-    const title = req.query.title;
-    const filteredBooks = books.filter((book) => book.title === String(title));
+  if (req.query.groups) {
+    const groups = req.query.groups as string;
+    const filteredBooks = getBookByGroups(groups);
     res.json(filteredBooks);
   } else {
-    res.json(books);
-  }
-});
+    res.json(getAllBooks());
+     }
+ });
+
 
 app.get("/books/:id", (req, res) => {
     const id = parseInt(req.params.id);
-    const book = books.find((book) => book.id === id);
+    const book = getBookById(id);
     if (book) {
     res.json(book);
     } else {
@@ -34,15 +65,14 @@ app.get("/books/:id", (req, res) => {
 
 app.post("/books", (req, res) => {
     const newBook: Book = req.body;
-    newBook.id = books.length + 1;
-    books.push(newBook);
+    addBook(newBook);
     res.json(newBook);
 });
 
 app.put("/books/:id", (req, res) => {
-  const updatedBook: Book = req.body;
+  const updatedBook: Partial<Book> = req.body;
   const id = Number(req.params.id);
-  const updated = books.find((book) => book.id === id);
+  const updated = updateBook(id, updatedBook);
   if (updated) {
     res.json(updated);
   } else {
