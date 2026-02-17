@@ -171,20 +171,22 @@ const books: Book[] = [
   },
 ];
 
-export function getAllBook(): Book[] {
-  return books;
+export function getAllBook(): Promise<Book[]> {
+  return Promise.resolve(books);
 }
 
-export function getBookByGroups(groups: string): Book[] {
-  return books.filter(book => book.groups === groups);
+export function getBookByGroups(groups: string): Promise<Book[]> {
+   const filteredBooks = books.filter(book => book.groups === groups);
+   return Promise.resolve(filteredBooks);
 }
 
-export function getBookById(id: number): Book | undefined {
-  return books.find(book => book.id === id);
+export function getBookById(id: number): Promise<Book | undefined> {
+return Promise.resolve(books.find((book) => book.id === id));
 }
 
-export function addBook(book: Book): void {
+export function addBook(book: Book): Promise<Book>{
   books.push(book);
+  return Promise.resolve(book);
 }
 
 export function updateBook(id: number, updatedBook: Partial<Book>): Book | undefined {
