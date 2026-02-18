@@ -1,4 +1,5 @@
-import Book from "../models/Book";
+// import Book from "../models/Book";
+import type Book  from "../models/Book";
 import * as repo from "../repositories/BookRepositoryDB";
 
 export const filterBooksByTitle = async (title: string): Promise<Book[]> => {
