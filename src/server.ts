@@ -1,13 +1,13 @@
 import express, { Request, Response } from "express";
 
 import {
-  getAllBook,
-  getBookByGroups,
-  getBookById,
   addBook,
+  filterBooksByTitle,
+  findBookById,
+  getAllBooks,
   updateBook,
 } from "./services/BookService";
-import type Book from "./models/book";
+import Book from "./models/Book";
 
 const app = express();
 const port = 3000;
@@ -18,43 +18,47 @@ app.listen(port, () => {
 });
 
 app.get("/books", async (req: Request, res: Response) => {
-  if (req.query.groups) {
-    const groups = req.query.groups as string;
-    const filteredBooks = getBookByGroups(groups);
+  if (req.query.title) {
+    const title = req.query.title;
+    const filteredBooks = await filterBooksByTitle(String(title));
     res.json(filteredBooks);
   } else {
-    res.json(getAllBook());
-     }
- });
-
-
-app.get("/books/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const book = getBookById(id);
-    if (book) {
-    res.json(book);
-    } else {
-    res.status(404).send("Book not found");
-    }
-});  
-
-app.post("/books", (req, res) => {
-    const newBook: Book = req.body;
-    addBook(newBook);
-    res.json(newBook);
+    const books = await getAllBooks();
+    res.json(books);
+  }
 });
 
-app.put("/books/:id", (req, res) => {
-  const updatedBook: Partial<Book> = req.body;
+app.get("/books/:id", async (req: Request, res: Response) => {
+  if (req.query.title) {
+    const title = req.query.title;
+    const filteredBooks = await filterBooksByTitle(String(title));
+    res.json(filteredBooks);
+  } else if (req.params.id) {
+    const id = req.params.id;
+    const filteredBooks = await findBookById(Number(id));
+    res.json(filteredBooks);
+  } else {
+    const books = await getAllBooks();
+    res.json(books);
+  }
+});
+
+app.post("/books", async (req: Request, res: Response) => {
+  const newBook: Book = req.body;
+  await addBook(newBook);
+  res.json(newBook);
+});
+
+app.put("/books/:id", async (req: Request, res: Response) => {
+  const updatedBook = req.body;
   const id = Number(req.params.id);
-  const updated = updateBook(id, updatedBook);
+  const updated = await updateBook(id, updatedBook);
   if (updated) {
     res.json(updated);
   } else {
     res.status(404).send("Book not found");
   }
 });
-
 
 
 
